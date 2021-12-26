@@ -323,7 +323,6 @@ class MainWindow(QMainWindow):
                     for i in class_content_list:
                         self.class_phy_database[time][index].append(i)
 
-                    # self.store_phy_teacher_num[time].append(class_teacher)
         # 获取选修课程信息
         elif class_type == 1:
             data['teachingClassType'] = self.teachingClassType[1]
