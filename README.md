@@ -1,6 +1,12 @@
 # Scramble Classes CTGU
 
+main.py是主程序
+
 打包好的程序在dist文件夹下
+
+usage.ui、usage_ui.py、main.ui、main_ui.py是ui界面
+
+logo.ico以及resources文件夹里是一些基本ico资源
 
 <font style="font-weight:700;color:#B399FF">详细的使用方法已经封装到软件里了，来说一下几个关键点吧</font>
 
