@@ -29,6 +29,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.signal = 3
+        self.time_limit = 0
         self.sort_kind = 0
         self.index = -1
         self.class_choose_index = 0
@@ -42,6 +44,8 @@ class MainWindow(QMainWindow):
         self.authorization = self.ui.lineEdit.text()
         self.ui.actionins.triggered.connect(self.usageshowFun)
         self.ui.comboBox_4.addItem('请搜索关键字')
+        self.ui.textBrowser.forward()
+        #self.ui.textBrowser.setReadOnly(True)
 
         self.ui.comboBox_2.currentIndexChanged.connect(self.selectionchange_fanan_teacher)
         self.ui.comboBox_3.currentIndexChanged.connect(self.selectionchange_fenji_class)
@@ -59,6 +63,7 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_8.clicked.connect(self.handleCalc_get_token)
         self.ui.pushButton_9.clicked.connect(self.handleCalc_get_choose_class)
         self.ui.pushButton_10.clicked.connect(self.handleCalc_clear_list)
+        self.ui.pushButton_11.clicked.connect(self.handleCalc_auto)
 
         self.uuid = ''
         self.login = {
@@ -114,7 +119,7 @@ class MainWindow(QMainWindow):
 
     def gui(self, text):
         self.ui.textBrowser.append(str(text))
-        self.ui.textBrowser.ensureCursorVisible()
+        # self.ui.textBrowser.ensureCursorVisible()
 
     def edit_clear(self):
         self.ui.textBrowser.clear()
@@ -234,6 +239,28 @@ class MainWindow(QMainWindow):
             self.ui.ms.text_print.emit(response_json['msg'])
             self.authorization = response_json['data']['token']
             self.handleCalc_get_class()
+
+    def handleCalc_auto(self):
+        before = time.time()
+        self.signal += 1
+        if self.signal % 2 == 0:
+            self.ui.pushButton_11.setText('停止')
+            thread_auto = Thread(target=self.thread_auto,
+                                       args=(before,))
+            thread_auto.setDaemon(True)
+            thread_auto.start()
+        else:
+            self.ui.pushButton_11.setText('自动选课')
+
+    def thread_auto(self, before):
+        while 1:
+            time.sleep(0.3)
+            if self.signal % 2 == 0 and (self.time_limit < 5*60):
+                self.go()
+                self.time_limit = time.time() - before
+            else:
+                self.ui.pushButton_11.setText('自动选课')
+                break
 
     # 搜索选修事件触发
     def handleCalc_get_choose_class(self):

@@ -639,6 +639,18 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButton_11">
+          <property name="font">
+           <font>
+            <family>黑体</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>自动选课</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton">
           <property name="font">
            <font>

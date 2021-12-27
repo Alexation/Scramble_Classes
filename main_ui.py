@@ -426,6 +426,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_10.addWidget(self.pushButton_2)
 
+        self.pushButton_11 = QPushButton(self.centralwidget)
+        self.pushButton_11.setObjectName(u"pushButton_11")
+        self.pushButton_11.setFont(font)
+
+        self.horizontalLayout_10.addWidget(self.pushButton_11)
+
         self.pushButton = QPushButton(self.centralwidget)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setFont(font)
@@ -482,6 +488,7 @@ class Ui_MainWindow(object):
         self.pushButton_10.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u7a7a", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"\u9009\u8bfe\u8fdb\u5ea6", None))
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u9664\u6587\u672c", None))
+        self.pushButton_11.setText(QCoreApplication.translate("MainWindow", u"\u81ea\u52a8\u9009\u8bfe", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u5f00\u59cb\u9009\u8bfe", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u5173\u4e8e", None))
     # retranslateUi
