@@ -1,4 +1,5 @@
 import pprint
+import time
 import sys
 import requests
 import json
@@ -66,15 +67,6 @@ class MainWindow(QMainWindow):
             'captcha': '',
             'uuid': ''
         }
-        # 体育
-        self.phy_class_data = []
-        # 选修
-        self.choose_class_data = []
-        self.phy_class_data_0 = 0
-        self.phy_class_data_1 = 0
-        self.class_data_0 = 0
-        self.class_data_1 = 0
-        self.class_data_ = [[] for _ in range(10)]
 
         # 获取课程信息的请求网址
         self.list_url = 'http://jwxk.ctgu.edu.cn/xsxk/elective/clazz/list'
@@ -103,10 +95,10 @@ class MainWindow(QMainWindow):
         self.teachingClassType = ['TYKC', 'XGKC', 'FANKC']  # 分别对应：分级课程、全校公共选修、方案内课程
 
         # 初始化获取到课程的数据库
-        self.class_list = [[] for _ in range(50)]
-        self.class_in_database = [[[] for _ in range(100)] for _ in range(50)]
-        self.class_phy_database = [[[] for _ in range(100)] for _ in range(50)]
-        self.class_choose_database = [[] for _ in range(100)]
+        self.class_list = [[] for _ in range(100)]
+        self.class_in_database = [[[] for _ in range(100)] for _ in range(51)]
+        self.class_phy_database = [[[] for _ in range(100)] for _ in range(51)]
+        self.class_choose_database = [[] for _ in range(51)]
         # 初始化请求参数
         self.get_info_params = {
             'campus': "01",
@@ -369,7 +361,6 @@ class MainWindow(QMainWindow):
 
     # 抢！！！
     def go(self):
-        print(self.class_list)
         self.ui.ms.text_print.emit('\n')
         thread_phy = Thread(target=self.thread_send,
                             args=())
@@ -379,7 +370,15 @@ class MainWindow(QMainWindow):
     def thread_send(self):
         for class_params in self.class_list:
             if class_params:
-                self.add_class(class_params)
+                thread_class_params = Thread(target=self.thread_send_go,
+                                             args=(class_params,))
+                thread_class_params.start()
+                thread_class_params.join()
+            else:
+                break
+
+    def thread_send_go(self, class_params):
+        self.add_class(class_params)
 
     # 对接选课接口
     def add_class(self, class_info):
