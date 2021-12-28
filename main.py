@@ -14,6 +14,7 @@ from threading import Thread
 from Crypto.Cipher import AES
 import base64
 import binascii
+from hashlib import md5
 
 from main_ui import Ui_MainWindow
 from usage_ui import Ui_Form
@@ -45,7 +46,7 @@ class MainWindow(QMainWindow):
         self.ui.actionins.triggered.connect(self.usageshowFun)
         self.ui.comboBox_4.addItem('请搜索关键字')
         self.ui.textBrowser.forward()
-        #self.ui.textBrowser.setReadOnly(True)
+        # self.ui.textBrowser.setReadOnly(True)
 
         self.ui.comboBox_2.currentIndexChanged.connect(self.selectionchange_fanan_teacher)
         self.ui.comboBox_3.currentIndexChanged.connect(self.selectionchange_fenji_class)
@@ -101,6 +102,7 @@ class MainWindow(QMainWindow):
 
         # 初始化获取到课程的数据库
         self.class_list = [[] for _ in range(100)]
+        self.class_list_backup = [[] for _ in range(100)]
         self.class_in_database = [[[] for _ in range(100)] for _ in range(51)]
         self.class_phy_database = [[[] for _ in range(100)] for _ in range(51)]
         self.class_choose_database = [[] for _ in range(51)]
@@ -215,16 +217,27 @@ class MainWindow(QMainWindow):
         rData = aes.encryptFromString(data)
         self.login['loginname'] = self.ui.lineEdit_3.text()
         self.login['password'] = str(rData)
-        self.login['captcha'] = self.ui.lineEdit_4.text()
         self.login['uuid'] = self.uuid
+
+        if self.ui.lineEdit_4.text():
+            self.login['captcha'] = self.ui.lineEdit_4.text()
+        else:
+            thread_get_token = Thread(target=self.thread_get_qr,
+                                      args=())
+            thread_get_token.start()
 
         thread_get_token = Thread(target=self.thread_get_token,
                                   args=())
         thread_get_token.setDaemon(True)
         thread_get_token.start()
 
+    def thread_get_qr(self):
+        qr = Chaojiying_Client('Alexation', '1234qwer', '927082')  # 用户中心>>软件ID 生成一个替换 96001
+        im = open('验证码.jpg', 'rb').read()  # 本地图片文件路径 来替换 a.jpg 有时WIN系统须要//
+        self.login['captcha'] = str(qr.PostPic(im, 1902))  # 1902 验证码类型  官方网站>>价格体系 3.4+版 print 后要加()
+
     def thread_get_token(self):
-        self.authorization = ''
+        #self.authorization = ''
         headers = {
             'Host': 'jwxk.ctgu.edu.cn',
             'Origin': 'http://jwxk.ctgu.edu.cn',
@@ -237,7 +250,11 @@ class MainWindow(QMainWindow):
             self.ui.ms.text_print.emit(response_json['msg'])
         else:
             self.ui.ms.text_print.emit(response_json['msg'])
-            self.authorization = response_json['data']['token']
+            # self.authorization = response_json['data']['token']
+            # self.headers['Authorization'] = self.authorization
+            self.headers['Authorization'] = response_json['data']['token']
+            self.headers['Referer'] = 'http://jwxk.ctgu.edu.cn/xsxk/elective/grablessons?' + \
+                                      'batchId=' + self.batchId + 'token=' + self.authorization
             self.handleCalc_get_class()
 
     def handleCalc_auto(self):
@@ -246,7 +263,7 @@ class MainWindow(QMainWindow):
         if self.signal % 2 == 0:
             self.ui.pushButton_11.setText('停止')
             thread_auto = Thread(target=self.thread_auto,
-                                       args=(before,))
+                                 args=(before,))
             thread_auto.setDaemon(True)
             thread_auto.start()
         else:
@@ -255,7 +272,7 @@ class MainWindow(QMainWindow):
     def thread_auto(self, before):
         while 1:
             time.sleep(0.3)
-            if self.signal % 2 == 0 and (self.time_limit < 5*60):
+            if self.signal % 2 == 0 and (self.time_limit < 5 * 60):
                 self.go()
                 self.time_limit = time.time() - before
             else:
@@ -273,22 +290,20 @@ class MainWindow(QMainWindow):
 
     # 清空备选列表
     def handleCalc_clear_list(self):
+        self.index = -1
         self.ui.comboBox.clear()
-        self.class_list = [[] for _ in range(50)]
+        self.class_list = [[] for _ in range(100)]
 
     # 通过token获取课表
     def handleCalc_get_class(self):
-        self.ui.comboBox.clear()
         self.ui.comboBox_2.clear()
         self.ui.comboBox_3.clear()
         self.ui.comboBox_4.clear()
         self.ui.comboBox_5.clear()
         self.ui.comboBox_6.clear()
-        self.handleCalc_clear_list()
-        self.class_list = [[] for _ in range(50)]
-        self.class_in_database = [[[] for _ in range(100)] for _ in range(50)]
-        self.class_phy_database = [[[] for _ in range(100)] for _ in range(50)]
-        self.class_choose_database = [[] for _ in range(100)]
+        self.class_in_database = [[[] for _ in range(100)] for _ in range(51)]
+        self.class_phy_database = [[[] for _ in range(100)] for _ in range(51)]
+        self.class_choose_database = [[] for _ in range(51)]
 
         # 获取体育课表
         thread_phy_get = Thread(target=self.thread_get_class,
@@ -308,7 +323,7 @@ class MainWindow(QMainWindow):
 
     # 获取课程信息
     def thread_get_class(self, class_type):
-        self.headers['Authorization'] = self.authorization
+        # self.headers['Authorization'] = self.authorization
         self.get_class_form(self.get_info_params, self.headers, class_type)
 
     def request_class_info(self, data, headers):
@@ -400,7 +415,7 @@ class MainWindow(QMainWindow):
                 thread_class_params = Thread(target=self.thread_send_go,
                                              args=(class_params,))
                 thread_class_params.start()
-                thread_class_params.join()
+                # thread_class_params.join()
             else:
                 break
 
@@ -555,6 +570,50 @@ class AEScryptor():
         data = self.__paddingData(self.data)
         enData = aes.encrypt(data)
         return MData(enData)
+
+
+# 识别验证码
+class Chaojiying_Client(object):
+
+    def __init__(self, username, password, soft_id):
+        self.username = username
+        password = password.encode('utf8')
+        self.password = md5(password).hexdigest()
+        self.soft_id = soft_id
+        self.base_params = {
+            'user': self.username,
+            'pass2': self.password,
+            'softid': self.soft_id,
+        }
+        self.headers = {
+            'Connection': 'Keep-Alive',
+            'User-Agent': 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)',
+        }
+
+    def PostPic(self, im, codetype):
+        """
+        im: 图片字节
+        codetype: 题目类型 参考 http://www.chaojiying.com/price.html
+        """
+        params = {
+            'codetype': codetype,
+        }
+        params.update(self.base_params)
+        files = {'userfile': ('ccc.jpg', im)}
+        r = requests.post('http://upload.chaojiying.net/Upload/Processing.php', data=params, files=files,
+                          headers=self.headers)
+        return r.json()['pic_str']
+
+    def ReportError(self, im_id):
+        """
+        im_id:报错题目的图片ID
+        """
+        params = {
+            'id': im_id,
+        }
+        params.update(self.base_params)
+        r = requests.post('http://upload.chaojiying.net/Upload/ReportError.php', data=params, headers=self.headers)
+        return r.json()
 
 
 if __name__ == "__main__":
