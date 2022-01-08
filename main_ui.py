@@ -28,6 +28,9 @@ class Ui_MainWindow(object):
         self.actiondemo.setFont(font)
         self.actionhappy = QAction(MainWindow)
         self.actionhappy.setObjectName(u"actionhappy")
+        self.actiona = QAction(MainWindow)
+        self.actiona.setObjectName(u"actiona")
+        self.actiona.setFont(font)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
@@ -113,14 +116,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.lineEdit)
 
-        self.pushButton_6 = QPushButton(self.centralwidget)
-        self.pushButton_6.setObjectName(u"pushButton_6")
-        self.pushButton_6.setFont(font)
-
-        self.horizontalLayout_5.addWidget(self.pushButton_6)
-
         self.horizontalLayout_5.setStretch(0, 10)
-        self.horizontalLayout_5.setStretch(1, 1)
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
 
@@ -460,6 +456,7 @@ class Ui_MainWindow(object):
 
         self.menubar.addAction(self.menu.menuAction())
         self.menu.addAction(self.actionins)
+        self.menu.addAction(self.actiona)
 
         self.retranslateUi(MainWindow)
 
@@ -467,15 +464,15 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Scramble for classes", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Taking Lessons", None))
         self.actionins.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528\u8bf4\u660e", None))
         self.actiondemo.setText(QCoreApplication.translate("MainWindow", u"\u7a0b\u5e8f\u6e90\u7801", None))
         self.actionhappy.setText("")
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Authorization", None))
+        self.actiona.setText(QCoreApplication.translate("MainWindow", u"\u5173\u4e8e\u4f5c\u8005", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"\u8d26\u53f7\u6388\u6743\u7801", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u65b9\u6848\u5185\u8bfe\u7a0b", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"\u5206\u7ea7\u8bfe\u7a0b", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"\u7d20\u8d28\u62d3\u5c55\u9009\u4fee", None))
-        self.pushButton_6.setText(QCoreApplication.translate("MainWindow", u"\u83b7\u53d6\u8bfe\u8868", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"\u6dfb\u52a0", None))
         self.pushButton_4.setText(QCoreApplication.translate("MainWindow", u"\u6dfb\u52a0", None))
         self.pushButton_9.setText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22", None))
@@ -490,6 +487,6 @@ class Ui_MainWindow(object):
         self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u9664\u6587\u672c", None))
         self.pushButton_11.setText(QCoreApplication.translate("MainWindow", u"\u81ea\u52a8\u9009\u8bfe", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u5f00\u59cb\u9009\u8bfe", None))
-        self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u5173\u4e8e", None))
+        self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u5e2e\u52a9", None))
     # retranslateUi
 

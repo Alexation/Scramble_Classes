@@ -18,7 +18,7 @@ from hashlib import md5
 
 from main_ui import Ui_MainWindow
 from usage_ui import Ui_Form
-
+from author_ui import Ui_Form_au
 
 class Catch_Signals(QObject):
     text_print = Signal(str)
@@ -44,6 +44,8 @@ class MainWindow(QMainWindow):
         self.ui.ms.text_print.connect(self.gui)
         self.authorization = self.ui.lineEdit.text()
         self.ui.actionins.triggered.connect(self.usageshowFun)
+        self.ui.actiona.triggered.connect(self.authorshowFun)
+
         self.ui.comboBox_4.addItem('请搜索关键字')
         self.ui.textBrowser.forward()
         # self.ui.textBrowser.setReadOnly(True)
@@ -59,7 +61,7 @@ class MainWindow(QMainWindow):
         self.ui.pushButton_3.clicked.connect(self.handleCalc_fanan)
         self.ui.pushButton_4.clicked.connect(self.handleCalc_fenji)
         self.ui.pushButton_5.clicked.connect(self.handleCalc_xuanxiu)
-        self.ui.pushButton_6.clicked.connect(self.handleCalc_get_class)
+        #self.ui.pushButton_6.clicked.connect(self.handleCalc_get_class)
         self.ui.pushButton_7.clicked.connect(self.handleCalc_get_qr)
         self.ui.pushButton_8.clicked.connect(self.handleCalc_get_token)
         self.ui.pushButton_9.clicked.connect(self.handleCalc_get_choose_class)
@@ -78,8 +80,8 @@ class MainWindow(QMainWindow):
         self.list_url = 'http://jwxk.ctgu.edu.cn/xsxk/elective/clazz/list'
         # 提交抢课请求的网址
         self.add_url = 'http://jwxk.ctgu.edu.cn/xsxk/elective/clazz/add'
-        # 这个值目前不清楚每个人是否一样，但对每个人是不会变的，也就是说最多设置一次
-        self.batchId = '40d2ffddeb04487a98f02ba2b50f60a8'
+        # batchID是选课轮次
+        self.batchId = ''
         # 请求头
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -118,6 +120,10 @@ class MainWindow(QMainWindow):
     def usageshowFun(self):
         self.usageFun = Usage()
         self.usageFun.show()
+
+    def authorshowFun(self):
+        self.aboutAuthor = Author()
+        self.aboutAuthor.show()
 
     def gui(self, text):
         self.ui.textBrowser.append(str(text))
@@ -158,26 +164,29 @@ class MainWindow(QMainWindow):
         self.index += 1
         class_name = self.ui.comboBox_5.currentText()
         class_teacher = self.ui.comboBox_2.currentText()
-        class_content = class_name + '---' + class_teacher
-        self.ui.comboBox.addItem(class_content)
-        for i in self.class_in_database[self.class_in_0_hold][self.class_in_1_hold]:
-            self.class_list[self.index].append(i)
+        if class_teacher and class_name:
+            class_content = class_name + '---' + class_teacher
+            self.ui.comboBox.addItem(class_content)
+            for i in self.class_in_database[self.class_in_0_hold][self.class_in_1_hold]:
+                self.class_list[self.index].append(i)
 
     def handleCalc_fenji(self):
         self.index += 1
         class_name = self.ui.comboBox_3.currentText()
         class_teacher = self.ui.comboBox_6.currentText()
-        class_content = class_name + '---' + class_teacher
-        self.ui.comboBox.addItem(class_content)
-        for i in self.class_phy_database[self.class_phy_0_hold][self.class_phy_1_hold]:
-            self.class_list[self.index].append(i)
+        if class_teacher and class_name:
+            class_content = class_name + '---' + class_teacher
+            self.ui.comboBox.addItem(class_content)
+            for i in self.class_phy_database[self.class_phy_0_hold][self.class_phy_1_hold]:
+                self.class_list[self.index].append(i)
 
     def handleCalc_xuanxiu(self):
         self.index += 1
-        class_content = '选修' + '---' + self.ui.comboBox_4.currentText()
-        self.ui.comboBox.addItem(class_content)
-        for i in self.class_choose_database[self.class_choose_index_hold]:
-            self.class_list[self.index].append(i)
+        if self.ui.comboBox_4.currentText() != '请搜索关键字' and self.ui.comboBox_4.currentText():
+            class_content = '选修' + '---' + self.ui.comboBox_4.currentText()
+            self.ui.comboBox.addItem(class_content)
+            for i in self.class_choose_database[self.class_choose_index_hold]:
+                self.class_list[self.index].append(i)
 
     # 获取验证码
     def handleCalc_get_qr(self):
@@ -208,28 +217,39 @@ class MainWindow(QMainWindow):
         img = PIL.Image.open('验证码.jpg')
         img.show()
 
-    # 模拟登录
-    def handleCalc_get_token(self):
+    def make_code(self, data):
         key = b"MWMqg2tPcDkxcm11"
         iv = b"0000000000000000"
         aes = AEScryptor(key, AES.MODE_ECB, iv, paddingMode="PKCS7Padding", characterSet='utf-8')
-        data = self.ui.lineEdit_5.text()
+        # data = self.ui.lineEdit_5.text()
         rData = aes.encryptFromString(data)
-        self.login['loginname'] = self.ui.lineEdit_3.text()
-        self.login['password'] = str(rData)
-        self.login['uuid'] = self.uuid
 
-        if self.ui.lineEdit_4.text():
-            self.login['captcha'] = self.ui.lineEdit_4.text()
-        else:
-            thread_get_token = Thread(target=self.thread_get_qr,
+        return str(rData)
+
+    # 模拟登录
+    def handleCalc_get_token(self):
+        user = self.ui.lineEdit_3.text()
+        author_token = self.make_code(user)
+        # XFGUF4SvUEQfj51soZNB8Q==
+        if self.ui.lineEdit.text() == author_token:
+
+            self.login['loginname'] = self.ui.lineEdit_3.text()
+            self.login['password'] = self.make_code(self.ui.lineEdit_5.text())
+            self.login['uuid'] = self.uuid
+
+            if self.ui.lineEdit_4.text():
+                self.login['captcha'] = self.ui.lineEdit_4.text()
+            else:
+                thread_get_token = Thread(target=self.thread_get_qr,
+                                          args=())
+                thread_get_token.start()
+
+            thread_get_token = Thread(target=self.thread_get_token,
                                       args=())
+            thread_get_token.setDaemon(True)
             thread_get_token.start()
-
-        thread_get_token = Thread(target=self.thread_get_token,
-                                  args=())
-        thread_get_token.setDaemon(True)
-        thread_get_token.start()
+        else:
+            self.ui.ms.text_print.emit('账号未授权或授权码错误\n')
 
     def thread_get_qr(self):
         qr = Chaojiying_Client('Alexation', '1234qwer', '927082')  # 用户中心>>软件ID 生成一个替换 96001
@@ -237,7 +257,6 @@ class MainWindow(QMainWindow):
         self.login['captcha'] = str(qr.PostPic(im, 1902))  # 1902 验证码类型  官方网站>>价格体系 3.4+版 print 后要加()
 
     def thread_get_token(self):
-        #self.authorization = ''
         headers = {
             'Host': 'jwxk.ctgu.edu.cn',
             'Origin': 'http://jwxk.ctgu.edu.cn',
@@ -250,9 +269,11 @@ class MainWindow(QMainWindow):
             self.ui.ms.text_print.emit(response_json['msg'])
         else:
             self.ui.ms.text_print.emit(response_json['msg'])
-            # self.authorization = response_json['data']['token']
-            # self.headers['Authorization'] = self.authorization
-            self.headers['Authorization'] = response_json['data']['token']
+
+            self.batchId = response_json['data']['student']['electiveBatchList'][0]['code']
+            self.authorization = response_json['data']['token']
+            self.headers['Authorization'] = self.authorization
+            self.headers['batchId'] = self.batchId
             self.headers['Referer'] = 'http://jwxk.ctgu.edu.cn/xsxk/elective/grablessons?' + \
                                       'batchId=' + self.batchId + 'token=' + self.authorization
             self.handleCalc_get_class()
@@ -296,6 +317,7 @@ class MainWindow(QMainWindow):
 
     # 通过token获取课表
     def handleCalc_get_class(self):
+        self.ui.comboBox.clear()
         self.ui.comboBox_2.clear()
         self.ui.comboBox_3.clear()
         self.ui.comboBox_4.clear()
@@ -304,6 +326,7 @@ class MainWindow(QMainWindow):
         self.class_in_database = [[[] for _ in range(100)] for _ in range(51)]
         self.class_phy_database = [[[] for _ in range(100)] for _ in range(51)]
         self.class_choose_database = [[] for _ in range(51)]
+        self.class_list = [[] for _ in range(100)]
 
         # 获取体育课表
         thread_phy_get = Thread(target=self.thread_get_class,
@@ -441,6 +464,13 @@ class Usage(QWidget):
     def __init__(self):
         super(Usage, self).__init__()
         self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+
+class Author(QWidget):
+    def __init__(self):
+        super(Author, self).__init__()
+        self.ui = Ui_Form_au()
         self.ui.setupUi(self)
 
 
@@ -621,7 +651,9 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon('resources\\logo.png'))
     main_window = MainWindow()
     main_window.show()
-    MessageBox = QMessageBox()
-    MessageBox.warning(main_window, "警告！",
-                       "<div style='font-family: SimHei' size='5' color='#00'>本软件禁止商用！</div>")
+    # MessageBox = QMessageBox()
+    # MessageBox.warning(main_window, "警告！",
+    #                    "<div style='font-family: SimHei' size='5' color='#00'>本软件禁止商用！</div>")
+    MessageBox = Usage()
+    MessageBox.show()
     sys.exit(app.exec_())

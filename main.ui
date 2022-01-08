@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Scramble for classes</string>
+   <string>Taking Lessons</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -33,7 +33,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Authorization</string>
+                 <string>账号授权码</string>
                 </property>
                </widget>
               </item>
@@ -144,25 +144,13 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="10,1">
+             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="10">
               <item>
                <widget class="QLineEdit" name="lineEdit">
                 <property name="font">
                  <font>
                   <family>黑体</family>
                  </font>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_6">
-                <property name="font">
-                 <font>
-                  <family>黑体</family>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>获取课表</string>
                 </property>
                </widget>
               </item>
@@ -689,9 +677,10 @@
      </font>
     </property>
     <property name="title">
-     <string>关于</string>
+     <string>帮助</string>
     </property>
     <addaction name="actionins"/>
+    <addaction name="actiona"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -725,6 +714,16 @@
   <action name="actionhappy">
    <property name="text">
     <string/>
+   </property>
+  </action>
+  <action name="actiona">
+   <property name="text">
+    <string>关于作者</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>黑体</family>
+    </font>
    </property>
   </action>
  </widget>
