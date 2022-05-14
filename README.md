@@ -32,10 +32,10 @@ logo.ico以及resources文件夹里是一些基本ico资源
 
 4. 密码加密
 
-   在js代码中拿到AES密钥后python构造函数加密，补齐方式为PKCS7Padding。
+   在js代码中拿到AES密钥后python构造函数加密，补齐方式为PKCS7Padding。密钥就不展示了
 
    ```
-   key = b"MWMqg2tPcDkxcm11"
+   key = b"xxxxxxxxxxxxxx"
    iv = b"0000000000000000"
    aes = AEScryptor(key, AES.MODE_ECB, iv, paddingMode="PKCS7Padding", characterSet='utf-8')
    data = self.ui.lineEdit_5.text()
